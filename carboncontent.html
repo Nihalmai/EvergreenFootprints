@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbon Footprint Calculator</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins",sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-image: url(https://cdna.artstation.com/p/assets/images/images/025/102/490/large/jorge-jacinto-wisp-red.jpg?1584627212);
+        }
+
+        .calculator-container {
+            border-radius: 8px;
+            color: white;
+            padding: 20px;
+            width: 300px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .input, .select {
+            border-radius: 20px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            border: 1px solid #000000;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #226A80;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.3s;
+            transition-property: background;
+        }
+
+        button:hover {
+            background: #0c4f60;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .unsafe-level {
+            color: red; /* Red color for unsafe level */
+        }
+
+        .safe-level {
+            color: #1CEFF2; /* Blue color for safe level */
+        }
+
+        #analyze-button {
+            display: none;
+            background-color: #226A80;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: 0.3s;
+            transition-property: background;
+        }
+
+        #analyze-button:hover{
+            background:#0C4F60;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calculator-container">
+        <h2>Carbon Footprint Calculator</h2>
+        <label for="energyConsumption">Energy Consumption (kWh):</label>
+        <input class="input" type="number" id="energyConsumption" required placeholder="Enter energy consumption">
+
+        <label for="dailyCalories">Daily Calorie Consumption:</label>
+        <input class="input" type="number" id="dailyCalories" required placeholder="Enter daily calorie consumption">
+
+        <label for="fuelType">Fuel Type:</label>
+        <select class="select" id="fuelType" required>
+            <option value="gasoline">Gasoline</option>
+            <option value="diesel">Diesel</option>
+            <option value="electric">Electric</option>
+            <option value="petrol">Petrol</option>
+        </select>
+
+        <label for="fuelConsumption">Fuel Consumption (liters or kWh):</label>
+        <input class="input" type="number" id="fuelConsumption" required placeholder="Enter fuel consumption">
+
+        <button onclick="calculateFootprint()">Calculate</button>
+
+        <div id="result"></div>
+
+        <button id="analyze-button" onclick="analyzeFurther()">Analyze Further</button>
+    </div>
+
+    <script>
+            function analyzeFurther() {
+            window.location.href = "analysis.html";
+            }
+
+            function calculateFootprint() {
+                const user = firebase.auth().currentUser;
+                    if (!user) {
+                    alert('Please log in to calculate your carbon footprint.');
+                    window.location.href = "login.html";
+                    return;
+                }
+                const energyConsumption = parseFloat(document.getElementById('energyConsumption').value);
+                const dailyCalories = parseFloat(document.getElementById('dailyCalories').value);
+const fuelType = document.getElementById('fuelType').value;
+const fuelConsumption = parseFloat(document.getElementById('fuelConsumption').value);
+
+                let co2Emissions;
+                switch (fuelType) {
+                case 'gasoline':
+                co2Emissions = fuelConsumption * 2.31;
+                break;
+                case 'diesel':
+                co2Emissions = fuelConsumption * 2.68;
+                break;
+                case 'electric':
+                co2Emissions = fuelConsumption * 0.5; // 0.5 kg/kWh 
+                break;
+                case 'petrol': 
+                co2Emissions = fuelConsumption * 2.21;
+                break;
+                default:
+                co2Emissions = 0;
+                } 
+                const energyCo2Emissions = energyConsumption * 0.5; // 0.5 kg/kWh 
+                const totalCo2Emissions = co2Emissions + energyCo2Emissions;
+                const carbonInCalories = dailyCalories * 0.00015; // 0.00015 kg CO2 equivalent per calorie                 
+                const totalFootprint = totalCo2Emissions + carbonInCalories;
+                const database_ref = firebase.database().ref();
+                const user_data = {
+                    energyConsumption: energyConsumption,
+                    dailyCalories: dailyCalories,
+                    fuelType: fuelType,
+                    fuelConsumption: fuelConsumption,
+                    totalFootprint: totalFootprint,
+                    co2Emissions: co2Emissions,
+                    carbonInCalories: carbonInCalories
+                };
+                database_ref.child('userInputs/' + user.uid).push(user_data)
+                .then(function(){
+                alert('User inputs and carbon footprint calculated successfully saved to the database!');
+                })
+                .catch(function(error){
+                console.error("Error writing user inputs and carbon footprint data to database: ", error);
+                });
+                
+                const resultElement = document.getElementById('result');
+                if (totalFootprint > 50) {
+                resultElement.innerHTML = `<span class="unsafe-level">Your estimated carbon footprint is ${totalFootprint.toFixed(2)} kg CO2.</span>\n
+                You used ${fuelConsumption.toFixed(2)} liters or kWh of ${fuelType} fuel, resulting in approximately ${co2Emissions.toFixed(2)} kg CO2 emissions.\n
+                The carbon content in your daily calorie consumption is approximately ${carbonInCalories.toFixed(2)} kg CO2 equivalent.`;
+
+                document.getElementById('analyze-button').style.display = 'block';
+            } else {
+                resultElement.innerHTML = `<span class="safe-level">Your estimated carbon footprint is ${totalFootprint.toFixed(2)} kg CO2.</span>\n
+                 You used ${fuelConsumption.toFixed(2)} liters or kWh of ${fuelType} fuel, resulting in approximately ${co2Emissions.toFixed(2)} kg CO2 emissions.\n
+                 The carbon content in your daily calorie consumption is approximately ${carbonInCalories.toFixed(2)} kg CO2 equivalent.`;
+
+          document.getElementById('analyze-button').style.display = 'none';
+    }
+
+    document.getElementById('analyze-button').disabled = false;
+            }
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+
+    <script src="firebase.js"></script>
+</body>
+</html>

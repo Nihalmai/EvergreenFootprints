@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Registration Page</title>
+      <link rel="stylesheet" href="register.css">
+    </head>
+    <body>
+        <div id="content_container">
+            <h1 class="heading">"WE PLEDGE THE GREEN"</h1>
+            <div id="form_container">
+                <div id="form_header_container">
+                    <h2 id="form_header" class="Login">Login</h2>
+                </div>
+
+                <div id="form_content_container">
+                    <div id="form_content_inner_container">
+                        <label class="email" for="email">YOUR EMAIL:</label>
+                        <input type="email" id="email" placeholder="Email">
+                        <label class="password" for="password">YOUR PASSWORD:</label>
+                        <input type="password" id="password" placeholder="New Password">
+                        <p class="no-account">Don't have an account? <a href="register.html" class="no-account">Register First</a></p>
+                        <a href="forgetpassword.html" class="forgot-password">Forgot Password?</a>
+                        <div id="button_container">
+                            <button onclick="login()">Login</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>    
+    </body>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+
+    <script src="firebase.js"></script>
+</html>

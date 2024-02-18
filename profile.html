@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile Page</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url(https://cdna.artstation.com/p/assets/images/images/025/102/490/large/jorge-jacinto-wisp-red.jpg?1584627212);
+  }
+  #profile {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+  }
+  #profile img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-bottom: 20px;
+    background-color: rgb(89, 187, 187);
+  }
+  .action-buttons button {
+    color: #fff;
+    background: #226A80;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    transition: 0.3s;
+    transition-property: background;
+  }
+  .action-buttons button:hover{
+    background: #0C4F60;
+  }
+  .name {
+    color: white;
+  }
+  .edit-form {
+    display: none;
+    margin-top: 20px;
+  }
+  .edit-form input {
+    padding: 8px;
+    margin: 5px;
+    width: calc(100% - 20px);
+    border-radius: 9px;
+    border: 1px solid #ccc;
+  }
+  .edit-form button {
+    color: #fff;
+    background: #226A80;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    transition: 0.3s;
+    transition-property: background;
+  }
+  .edit-form button:hover{
+    background: #0C4F60;
+  }
+</style>
+</head>
+<body>
+
+<div id="profile">
+    <h1>Profile</h1>
+    <img id="profilePic" src="https://cdn2.iconfinder.com/data/icons/random-outline-3/48/random_14-1024.png" alt="Profile Picture">
+    <div class="profile-info">
+        <h2 class="name">Name: Amisha Lalwani</h2>
+        <h2 class="email">Email: amishalalwani701@gmail.com</h2>
+        <h2 class="phone">Phone: +91-7302301846</h2>
+        <h2 class="address">Address: Palaj, Gandhinagar, Gujarat</h2>
+    </div>
+    <div class="action-buttons">
+        <button onclick="toggleEditForm()">Edit Profile</button>
+    </div>
+    <form class="edit-form" id="editForm" onsubmit="updateProfile(event)">
+        <input type="text" id="editName" placeholder="New Name">
+        <input type="email" id="editEmail" placeholder="New Email">
+        <input type="tel" id="editPhone" placeholder="New Phone">
+        <input type="text" id="editAddress" placeholder="New Address">
+        <input type="file" id="editProfilePic" accept="image/*">
+        <button type="submit">Save</button>
+    </form>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-storage.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyB4B5VRku3khUeFassuxji4COZCb50f18E",
+    authDomain: "evergreenfootprints-d8c9a.firebaseapp.com",
+    databaseURL: "https://evergreenfootprints-d8c9a-default-rtdb.firebaseio.com",
+    projectId: "evergreenfootprints-d8c9a",
+    storageBucket: "evergreenfootprints-d8c9a.appspot.com",
+    messagingSenderId: "482230089378",
+    appId: "1:482230089378:web:8bc723964b3bd8cda1c9fb",
+    measurementId: "G-QKEQ4M2DLH"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const database = firebase.database();
+
+function toggleEditForm() {
+                const user = firebase.auth().currentUser;
+                if (!user) {
+                    alert('Please log in to edit your profile.');
+                    window.location.href = "login.html";
+                    return;
+                }
+    var form = document.getElementById("editForm");
+    form.style.display = (form.style.display === "none") ? "block" : "none";
+}
+
+function fetchUserProfile() {
+  const loggedInUser = {
+    name: "First_Name Last_Name",
+    email: "yourmailid@example.com",
+    phone: "+1234567890",
+    address: "Enter your address",
+    profilePic: "https://cdn2.iconfinder.com/data/icons/random-outline-3/48/random_14-1024.png"
+  };
+  return loggedInUser;
+}
+
+window.onload = function() {
+  const loggedInUser = fetchUserProfile();
+  document.querySelector('.name').textContent = "Name: " + loggedInUser.name;
+  document.querySelector('.email').textContent = "Email: " + loggedInUser.email;
+  document.querySelector('.phone').textContent = "Phone: " + loggedInUser.phone;
+  document.querySelector('.address').textContent = "Address: " + loggedInUser.address;
+  document.getElementById('profilePic').src = loggedInUser.profilePic;
+};
+
+function updateProfile(event) {
+  event.preventDefault();
+
+  const loggedInUserId = localStorage.getItem('uid');
+  if (!loggedInUserId) {
+      console.log("User not logged in");
+      return;
+  }
+
+  const newName = document.getElementById('editName').value;
+  const newEmail = document.getElementById('editEmail').value;
+  const newPhone = document.getElementById('editPhone').value;
+  const newAddress = document.getElementById('editAddress').value;
+  const newProfilePic = document.getElementById('editProfilePic').files[0]; // Get the file
+
+  const updates = {};
+  if (newName) updates['name'] = newName;
+  if (newEmail) updates['email'] = newEmail;
+  if (newPhone) updates['phone'] = newPhone;
+  if (newAddress) updates['address'] = newAddress;
+  if (newProfilePic) {
+      const storageRef = firebase.storage().ref();
+      const profilePicRef = storageRef.child(`profile_pics/${loggedInUserId}/${newProfilePic.name}`);
+      profilePicRef.put(newProfilePic)
+          .then((snapshot) => {
+              return snapshot.ref.getDownloadURL();
+          })
+          .then((downloadURL) => {
+              updates['profilePic'] = downloadURL; // Update the profile pic URL in the database
+              document.getElementById('profilePic').src = downloadURL; // Update the displayed profile pic
+              console.log('File available at', downloadURL);
+              
+              const userRef = database.ref('users/' + loggedInUserId);
+              return userRef.update(updates);
+          })
+          .then(() => {
+              console.log("Profile updated successfully");
+              // Update the UI to reflect the changes
+              if (newName) {
+                  document.querySelector('.name').textContent = "Name: " + newName;
+              }
+              if (newEmail) {
+                  document.querySelector('.email').textContent = "Email: " + newEmail;
+              }
+              if (newPhone) {
+                  document.querySelector('.phone').textContent = "Phone: " + newPhone;
+              }
+              if (newAddress) {
+                  document.querySelector('.address').textContent = "Address: " + newAddress;
+              }
+              // Hide the edit form after successful update
+              toggleEditForm();
+          })
+          .catch((error) => {
+              console.error("Error updating profile:", error);
+          });
+  } else {
+      const userRef = database.ref('users/' + loggedInUserId);
+      userRef.update(updates)
+          .then(() => {
+              console.log("Profile updated successfully");
+              // Update the UI to reflect the changes
+              if (newName) {
+                  document.querySelector('.name').textContent = "Name: " + newName;
+              }
+              if (newEmail) {
+                  document.querySelector('.email').textContent = "Email: " + newEmail;
+              }
+              if (newPhone) {
+                  document.querySelector('.phone').textContent = "Phone: " + newPhone;
+              }
+              if (newAddress) {
+                  document.querySelector('.address').textContent = "Address: " + newAddress;
+              }
+              // Hide the edit form after successful update
+              toggleEditForm();
+          })
+          .catch((error) => {
+              console.error("Error updating profile:", error);
+          });
+  }
+}
+</script>
+
+</body>
+</html>

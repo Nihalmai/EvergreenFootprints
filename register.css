@@ -1,0 +1,91 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+body {
+    background-image: url(https://cdna.artstation.com/p/assets/images/images/025/102/490/large/jorge-jacinto-wisp-red.jpg?1584627212);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+#form_container,
+.login-container {
+    border-radius: 8px;
+    padding: 20px;
+    width: 300px;
+    text-align: center;
+}
+
+#full_name, #email, #password,
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    border: 1px solid #0c0808;
+    border-radius: 4px;
+}
+
+#button_container {
+    margin-top: 20px;
+}
+
+button {
+    background-color: #226A80;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    width: 100px;
+    margin-right: 10px;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background: #0C4F60;
+}
+
+#form_header,
+.heading {
+    color: #faf8f8;
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+    color: #000;
+}
+
+.no-account {
+    margin-top: 20px;
+    color: #020101;
+    cursor: pointer;
+}
+
+.no-account a {
+    color: rgb(19, 18, 18);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.forgot-password {
+    display: block;
+    margin-top: 10px;
+    color: #0d4549;
+    text-align: center;
+    font-size: small;
+    font-weight: bold;
+}
